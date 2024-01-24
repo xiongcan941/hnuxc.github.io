@@ -1,6 +1,16 @@
-﻿![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.001.png)
-
-**golang GMP 调度模型 副本**
+--- 
+layout: post
+title: golang GMP 调度模型
+subtitle: golang GMP 调度模型
+date: 2024-01-24
+author: xc
+header-img: img/post-bg-ios9-web.jpg
+catalog: true
+tags:
+    - golang
+    - GMP
+--- 
+# golang GMP 调度模型
 
 |<p>参考文档：https://www.yuque.com/aceld/golang/srxd6d</p><p>[Golang 调度模型与 GMP](https://bytedance.feishu.cn/wiki/wikcnmGbcQKn3q5aLq2jZ1tuDIf) [协程和Golang GMP调度模型](https://bytedance.feishu.cn/docs/doccnayMmy0GHZWPfJL4XrHToKb#) </p>|
 | :- |
@@ -11,7 +21,7 @@
 
 我们知道，一切的软件都是跑在操作系统上，真正用来干活(计算)的是CPU。早期的操作系统每个程序就是一个进程，知道一个程序运行完，才能进行下一个进程，就是“单进程时代”：一切的程序只能串行发生。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.002.png)
+![](/_posts/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.002.png)
 
 早期的单进程操作系统，面临2个问题：
 
