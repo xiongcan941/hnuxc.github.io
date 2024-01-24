@@ -12,16 +12,13 @@ tags:
 --- 
 # golang GMP 调度模型
 
-|<p>参考文档：https://www.yuque.com/aceld/golang/srxd6d</p><p>[Golang 调度模型与 GMP](https://bytedance.feishu.cn/wiki/wikcnmGbcQKn3q5aLq2jZ1tuDIf) [协程和Golang GMP调度模型](https://bytedance.feishu.cn/docs/doccnayMmy0GHZWPfJL4XrHToKb#) </p>|
-| :- |
-
 <a name="heading_0"></a>**一、Golang“调度器”的由来？**
 
 <a name="heading_1"></a>**(1) 单进程时代不需要调度器**
 
 我们知道，一切的软件都是跑在操作系统上，真正用来干活(计算)的是CPU。早期的操作系统每个程序就是一个进程，知道一个程序运行完，才能进行下一个进程，就是“单进程时代”：一切的程序只能串行发生。
 
-![](/_posts/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.002.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.002.png)
 
 早期的单进程操作系统，面临2个问题：
 
@@ -35,7 +32,7 @@ tags:
 
 <a name="heading_2"></a>**(2)多进程/线程时代有了调度器需求**
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.003.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.003.png)
 
 在多进程/多线程的操作系统中，就解决了阻塞的问题，因为一个进程阻塞cpu可以立刻切换到其他进程中去执行，而且调度cpu的算法可以保证在运行的进程都可以被分配到cpu的运行时间片。这样从宏观来看，似乎多个进程是在同时被运行。
 
@@ -45,7 +42,7 @@ tags:
 
 但是对于Linux操作系统来讲，cpu对进程的态度和线程的态度是一样的。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.004.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.004.png)
 
 很明显，CPU调度切换的是进程和线程。尽管线程看起来很美好，但实际上多线程开发设计会变得更加复杂，要考虑很多同步竞争等问题，如锁、竞争冲突等。
 
@@ -73,7 +70,7 @@ tags:
 
 协程（coroutine）又叫做用户空间线程，强调「用户空间的」原因在于，协程的实现方式是在用户空间里模拟上下文切换和调度，来避免进入内核态。它区别于进程和线程的主要特点是，协程的调度，切换和具体实现都是用户可定义的，不需要进入内核态，最大化的降低内核级别的调度和上下文切换。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.005.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.005.png)
 
 既然一个协程(co-routine)可以绑定一个线程(thread)，那么能不能多个协程(co-routine)绑定一个或者多个线程(thread)上呢。
 
@@ -81,7 +78,7 @@ tags:
 
 M个协程绑定N个线程。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.006.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.006.png)
 
 协程跟线程是有区别的，线程由CPU调度是抢占式的，**协程由用户态调度是协作式的**，一个协程让出CPU后，才执行下一个协程。
 
@@ -100,7 +97,7 @@ Goroutine特点：
 
 Go目前使用的调度器是2012年重新设计的，因为之前的调度器性能存在问题，所以使用4年就被废弃了，那么我们先来分析一下被废弃的调度器是如何运作的？
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.007.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.007.png)
 
 G表示Goroutine，M来表示线程。M想要执行、放回G都必须访问全局G队列，并且M有多个，即多线程访问同一资源需要加锁进行保证互斥/同步，所以全局G队列是有互斥锁进行保护的。
 
@@ -136,7 +133,7 @@ G：goroutine
 
 在Go中，**线程是运行goroutine的实体，调度器的功能是把可运行的goroutine分配到工作线程上**。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.008.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.008.png)
 
 1. **全局队列**（Global Queue）：存放等待运行的G。
 2. **P的本地队列**：同全局队列类似，存放的也是等待运行的G，存的数量有限，不超过256个。新建G'时，G'优先加入到P的本地队列，如果队列满了，则会把本地队列中一半的G移动到全局队列。
@@ -173,11 +170,11 @@ G：goroutine
 
 当本线程无可运行的G时，尝试从其他线程绑定的P偷取G，而不是销毁线程。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.009.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.009.png)
 
 2）hand off机制
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.010.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.010.png)
 
 当本线程因为G进行系统调用阻塞时，线程释放绑定的P，把P转移给其他空闲的线程执行。
 
@@ -189,7 +186,7 @@ G：goroutine
 
 <a name="heading_14"></a>**(3) go func()  调度流程**
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.011.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.011.png)
 
 从上图我们可以分析出几个结论：
 
@@ -207,7 +204,7 @@ G：goroutine
 
 <a name="heading_15"></a>**(4) 调度器的生命周期**
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.012.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.012.png)
 
 特殊的M0和G0：
 
@@ -221,8 +218,12 @@ G0是每次启动一个M都会第一个创建的gourtine，G0仅用于负责调�
 
 我们来跟踪一段代码
 
-|Go<br>package main<br><br>import "fmt"<br><br>func main() {<br>`    `fmt.Println("Hello world")<br>}|
-| :- |
+```
+package main
+import "fmt"
+func main() {
+    fmt.Println("Hello world")}
+```
 
 接下来针对上面的代码对调度器里面的结构做一个分析。
 
@@ -244,25 +245,25 @@ G0是每次启动一个M都会第一个创建的gourtine，G0仅用于负责调�
 
 P拥有G1，M1获取P后开始运行G1，G1使用go func()创建了G2，为了局部性G2优先加入到P1的本地队列。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.013.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.013.png)
 
 <a name="heading_18"></a>**场景2**
 
 G1运行完成后(函数：goexit)，M上运行的goroutine切换为G0，G0负责调度协程的切换（函数：schedule）。从P的本地队列取G2，从G0切换到G2，并开始运行G2(函数：execute)。实现了线程M1的复用。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.014.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.014.png)
 
 <a name="heading_19"></a>**场景3**
 
 假设每个P的本地队列只能存3个G。G2要创建了6个G，前3个G（G3, G4, G5）已经加入p1的本地队列，p1本地队列满了。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.015.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.015.png)
 
 <a name="heading_20"></a>**场景4**
 
 G2在创建G7的时候，发现P1的本地队列已满，需要执行**负载均衡**(把P1中本地队列中前一半的G，还有新创建G**转移**到全局队列)，实现中并不一定是新的G，如果G是G2之后就执行的，会被保存在本地队列，利用某个老的G替换新G加入全局队列。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.016.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.016.png)
 
 这些G被转移到全局队列时，会被打乱顺序。所以G3,G4,G7被转移到全局队列。
 
@@ -270,7 +271,7 @@ G2在创建G7的时候，发现P1的本地队列已满，需要执行**负载均
 
 G2创建G8时，P1的本地队列未满，所以G8会被加入到P1的本地队列。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.017.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.017.png)
 
 G8加入到P1点本地队列的原因还是因为P1此时在与M1绑定，而G2此时是M1在执行。所以G2创建的新的G会优先放置到自己的M绑定的P上。
 
@@ -278,7 +279,7 @@ G8加入到P1点本地队列的原因还是因为P1此时在与M1绑定，而G2�
 
 规定：**在创建G时，运行的G会尝试唤醒其他空闲的P和M组合去执行**。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.018.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.018.png)
 
 假定G2唤醒了M2，M2绑定了P2，并运行G0，但P2本地队列没有G，M2此时为自旋线程**（没有G但为运行状态的线程，不断寻找G）**。
 
@@ -286,7 +287,7 @@ G8加入到P1点本地队列的原因还是因为P1此时在与M1绑定，而G2�
 
 M2尝试从全局队列(简称“GQ”)取一批G放到P2的本地队列（函数：findrunnable()），至少从全局队列取1个g，但每次不要从全局队列移动太多的g到p本地队列，给其他p留点。这是**从全局队列到P本地队列的负载均衡**。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.019.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.019.png)
 
 假定我们场景中一共有4个P（GOMAXPROCS设置为4，那么我们允许最多就能用4个P来供M使用）。所以M2只从能从全局队列取1个G（即G3）移动P2本地队列，然后完成从G0到G3的切换，运行G3。
 
@@ -294,7 +295,7 @@ M2尝试从全局队列(简称“GQ”)取一批G放到P2的本地队列（函�
 
 假设G2一直在M1上运行，经过2轮后，M2已经把G7、G4从全局队列获取到了P2的本地队列并完成运行，全局队列和P2的本地队列都空了,如场景8图的左半部分。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.020.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.020.png)
 
 
 **全局队列已经没有G，那m就要执行work stealing(偷取)：从其他有G的P哪里偷取一半G过来，放到自己的P本地队列**。P2从P1的本地队列尾部取一半的G，本例中一半则只有1个G8，放到P2的本地队列并执行。
@@ -303,7 +304,7 @@ M2尝试从全局队列(简称“GQ”)取一批G放到P2的本地队列（函�
 
 G1本地队列G5、G6已经被其他M偷走并运行完成，当前M1和M2分别在运行G2和G8，M3和M4没有goroutine可以运行，M3和M4处于**自旋状态**，它们不断寻找goroutine。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.021.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.021.png)
 
 为什么要让m3和m4自旋，自旋本质是在运行，线程在运行却没有执行G，就变成了浪费CPU.  为什么不销毁现场，来节约CPU资源。因为创建和销毁CPU也会浪费时间，我们**希望当有新goroutine创建时，立刻能有M运行它**，如果销毁再新建就增加了时延，降低了效率。当然也考虑了过多的自旋线程是浪费CPU，所以系统中最多有GOMAXPROCS个自旋的线程(当前例子中的GOMAXPROCS=4，所以一共4个P)，多余的没事做线程会让他们休眠。
 
@@ -311,13 +312,13 @@ G1本地队列G5、G6已经被其他M偷走并运行完成，当前M1和M2分别
 
 假定当前除了M3和M4为自旋线程，还有M5和M6为空闲的线程(没有得到P的绑定，注意我们这里最多就只能够存在4个P，所以P的数量应该永远是M>=P, 大部分都是M在抢占需要运行的P)，G8创建了G9，G8进行了**阻塞的系统调用**，M2和P2立即解绑，P2会执行以下判断：如果P2本地队列有G、全局队列有G或有空闲的M，P2都会立马唤醒1个M和它绑定，否则P2则会加入到空闲P列表，等待M来获取可用的p。本场景中，P2本地队列有G9，可以和其他空闲的线程M5绑定。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.022.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.022.png)
 
 <a name="heading_27"></a>**场景11**
 
 G8创建了G9，假如G8进行了**非阻塞系统调用**。
 
-![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.023.png)
+![](/img/Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.023.png)
 
 M2和P2会解绑，但M2会记住P2，然后G8和M2进入**系统调用**状态。当G8和M2退出系统调用时，会尝试获取P2，如果无法获取，则获取空闲的P，如果依然没有，G8会被记为可运行状态，并加入到全局队列,M2因为没有P的绑定而变成休眠状态(长时间休眠等待GC回收销毁)。
 
