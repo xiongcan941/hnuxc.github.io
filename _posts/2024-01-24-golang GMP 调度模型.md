@@ -1,5 +1,15 @@
-﻿![](Aspose.Words.563a0ceb-beb7-4371-a24a-a4e38a8f2bc5.001.png)
-
+--- 
+layout: post
+title: golang GMP 调度模型
+subtitle: golang GMP 调度模型
+date: 2024-01-24
+author: xc
+header-img: img/post-bg-ios9-web.jpg
+catalog: true
+tags:
+    - golang
+    - GMP
+--- 
 # golang GMP 调度模型
 
 |<p>参考文档：https://www.yuque.com/aceld/golang/srxd6d</p><p>[Golang 调度模型与 GMP](https://bytedance.feishu.cn/wiki/wikcnmGbcQKn3q5aLq2jZ1tuDIf) [协程和Golang GMP调度模型](https://bytedance.feishu.cn/docs/doccnayMmy0GHZWPfJL4XrHToKb#) </p>|
